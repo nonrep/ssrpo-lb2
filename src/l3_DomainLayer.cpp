@@ -10,12 +10,12 @@ const std::vector<DeviceApp> &Order::getDeviceApps() const
     return _device_apps;
 }
 
-void Order::setDeviceApps(const std::vector<DeviceApp> &apps) const
+void Order::setDeviceApps(const std::vector<DeviceApp> &apps)
 {
     _device_apps = apps;
 }
 
-std::string Order::getDate() const
+const std::string Order::getDate() const
 {
     return _date;
 }
@@ -23,26 +23,6 @@ std::string Order::getDate() const
 void Order::setDate(const std::string date)
 {
     _date = date;
-}
-
-const std::vector<Order> &Buyer::getCart() const
-{
-    return _cart;
-}
-
-const std::vector<Order> &Buyer::getOrderHistory() const
-{
-    return _order_history;
-}
-
-void Buyer::setCart(const std::vector<Order> &cart) const
-{
-    _cart = cart;
-}
-
-void Buyer::setOrderHistory(const std::vector<Order> &history) const
-{
-    _order_history = history;
 }
 
 bool DeviceApp::invariant() const
@@ -91,33 +71,54 @@ uint8_t DeviceApp::getEvaluation() const
     return _evaluation;
 }
 
-bool DeviceApp::write(ostream &os)
+bool Order::write(ostream &os)
 {
-    writeString(os, _app_name);
-    writeString(os, _categoty);
-    writeNumber(os, _app_cost);
-    writeNumber(os, _app_size);
-    writeNumber(os, _num_of_installing);
-    writeNumber(os, _evaluation);
+    writeString(os, _date);
+
+    size_t apps_count = _device_apps.size();
+    writeNumber(os, apps_count);
+
+    for(const DeviceApp & d : _device_apps)
+    {
+        writeString(os, d.getAppName());
+        writeString(os, d.getCategory());
+        writeNumber(os, d.getAppCost());
+        writeNumber(os, d.getAppSize());
+        writeNumber(os, d.getInstallingNum());
+        writeNumber(os, d.getEvaluation());
+    }
 
     return os.good();
 }
 
 shared_ptr<ICollectable> ItemCollector::read(istream &is)
-{
-    string app_name = readString(is, MAX_APP_NAME_LENGTH);
-    string category = readString(is, MAX_CATEGORY_LENGTH);
-    uint16_t app_cost = readNumber<uint16_t>(is);
-    uint16_t app_size = readNumber<uint16_t>(is);
-    uint32_t num_of_installing = readNumber<uint32_t>(is);
-    uint8_t evaluation = readNumber<uint8_t>(is);
+{   
+    string date        = readString(is, MAX_DATE_LENGTH);
+    size_t apps_count = readNumber<size_t>(is);
 
-    return std::make_shared<DeviceApp>(app_name, category, app_cost, app_size, num_of_installing, evaluation);
+    vector<DeviceApp> apps;
+
+    apps.reserve(apps_count);
+    for(size_t i=0; i < apps_count; ++i)
+    {
+        string app_name = readString(is, MAX_APP_NAME_LENGTH);
+        string category = readString(is, MAX_CATEGORY_LENGTH);
+        uint16_t app_cost = readNumber<uint16_t>(is);
+        uint16_t app_size = readNumber<uint16_t>(is);
+        uint32_t num_of_installing = readNumber<uint32_t>(is);
+        uint8_t evaluation = readNumber<uint8_t>(is);
+
+        apps.push_back(DeviceApp(app_name, category, app_cost, app_size, num_of_installing, evaluation));
+    }
+
+    shared_ptr<ICollectable> order = std::make_shared<Order>(date, apps);
+
+    return order;
 }
 
-Buyer &ItemCollector::getBuyerRef(size_t index)
+Order &ItemCollector::getOrderRef(size_t index)
 {
-    Buyer &b = *dynamic_cast<Buyer *>(getItem(index).get());
-
+    Order &b = *static_cast<Order *>(getItem(index).get());
+    
     return b;
 }

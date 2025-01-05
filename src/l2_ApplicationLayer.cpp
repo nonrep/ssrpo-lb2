@@ -2,10 +2,31 @@
 */
 
 #include "hw/l2_ApplicationLayer.h"
+#include <ctime>
+#include <iomanip>
+#include <sstream>
+#include <map>
+#include <set>
+#include <algorithm>
+
 
 using namespace std;
 
 inline const string DATA_DEFAULT_NAME = "lab.data";
+
+string getCurrentDate() {
+    time_t t = std::time(nullptr);
+        tm* now = std::localtime(&t);
+
+        // Форматирование даты в строку
+        ostringstream dateStream;
+        dateStream << std::setfill('0') << std::setw(2) << now->tm_mday << "."
+               << std::setfill('0') << std::setw(2) << now->tm_mon + 1 << "."
+               << now->tm_year + 1900;
+
+        string currentDate = dateStream.str();
+        return currentDate;
+}
 
 bool Application::performCommand(const vector<string> & args)
 {
@@ -51,6 +72,23 @@ bool Application::performCommand(const vector<string> & args)
         return true;
     }
 
+    if (args[0] == "bo" || args[0] == "begin_order")
+    {
+        if (args.size() != 1)
+        {
+            _out.Output("Некорректное количество аргументов команды begin_order");
+            return false;
+        }
+        
+        vector<DeviceApp> apps;
+
+        string currentDate = getCurrentDate();
+        
+        _col.addItem(make_shared<Order>(currentDate, apps));
+
+        return true;
+    }
+
     if (args[0] == "a" || args[0] == "add")
     {
         if (args.size() != 7)
@@ -58,25 +96,40 @@ bool Application::performCommand(const vector<string> & args)
             _out.Output("Некорректное количество аргументов команды add");
             return false;
         }
+        // Order & ord = _col.getOrderRef(_col.getSize());
+        // Order & ord = _col.getOrderLast();
 
-        _col.addItem(make_shared<DeviceApp>(args[1].c_str(), args[2].c_str(), stoul(args[3]), stoul(args[4]), stoul(args[5]), stoul(args[6])));
+        
+        Order & ord = _col.getOrderRef(_col.getSize() - 1);
+
+        vector<DeviceApp> apps = ord.getDeviceApps();
+        apps.push_back(DeviceApp(args[1].c_str(), args[2].c_str(), stoul(args[3]), stoul(args[4]), stoul(args[5]), stoul(args[6])));
+        
+        ord.setDeviceApps(apps);
+
         return true;
     }
 
-
-    if (args[0] == "ao" || args[0] == "add_order")
+    if (args[0] == "m" || args[0] == "make")
     {
-        if (args.size() != 5)
+        if (args.size() != 1)
         {
-            _out.Output("Некорректное количество аргументов команды add_order");
+            _out.Output("Некорректное количество аргументов команды make");
             return false;
         }
 
-        Buyer & b = _col.getBuyerRef(stoul(args[1]));
+        Order & ord = _col.getOrderRef(_col.getSize() - 1);
 
-        vector<Order> o = b.getCart();
-        o.push_back(Order(stod(args[2]),stod(args[3]),stod(args[4])));
-        b.setCart(o);
+        vector<DeviceApp> apps = ord.getDeviceApps();
+
+        if (apps.size() < 1) {
+            _out.Output("Ошибка выполнения заказа. Пустая корзина!");
+            return false;
+        } 
+
+        string currentDate = getCurrentDate();
+
+        ord.setDate(currentDate);
 
         return true;
     }
@@ -93,17 +146,17 @@ bool Application::performCommand(const vector<string> & args)
         return true;
     }
 
-    if (args[0] == "u" || args[0] == "update")
-    {
-        if (args.size() != 8)
-        {
-            _out.Output("Некорректное количество аргументов команды update");
-            return false;
-        }
+    // if (args[0] == "u" || args[0] == "update")
+    // {
+    //     if (args.size() != 8)
+    //     {
+    //         _out.Output("Некорректное количество аргументов команды update");
+    //         return false;
+    //     }
 
-        _col.updateItem(stoul(args[1]), make_shared<DeviceApp>(args[2].c_str(), args[3].c_str(), stoul(args[4]), stoul(args[5]), stoul(args[6]), stoul(args[7])));
-        return true;
-    }
+    //     _col.updateItem(stoul(args[1]), make_shared<DeviceApp>(args[2].c_str(), args[3].c_str(), stoul(args[4]), stoul(args[5]), stoul(args[6]), stoul(args[7])));
+    //     return true;
+    // }
 
     if (args[0] == "v" || args[0] == "view")
     {
@@ -116,23 +169,91 @@ bool Application::performCommand(const vector<string> & args)
         size_t count = 0;
         for(size_t i=0; i < _col.getSize(); ++i)
         {
-            const DeviceApp & item = static_cast<DeviceApp &>(*_col.getItem(i));
+            const Order & item = static_cast<Order &>(*_col.getItem(i));
 
             if (!_col.isRemoved(i))
             {
                 _out.Output("[" + to_string(i) + "] "
-                        + item.getAppName() + " "
-                        + item.getCategory() + " "
-                        + to_string(item.getAppCost()) + "$ "
-                        + to_string(item.getAppSize()) + "MB "
-                        + to_string(item.getInstallingNum()) + " "
-                        + to_string(item.getEvaluation()) + "/5"
+                        + item.getDate() + " "
+                );
+
+                for(const DeviceApp & a : item.getDeviceApps()) {
+
+                    _out.Output("[" + to_string(i) + "] "
+                            + a.getAppName() + " "
+                            + a.getCategory() + " "
+                            + to_string(a.getAppCost()) + "$ "
+                            + to_string(a.getAppSize()) + "MB "
+                            + to_string(a.getInstallingNum()) + " "
+                            + to_string(a.getEvaluation()) + "/5"
                     );
+                }
                 count ++;
+                
             }
         }
 
         _out.Output("Количество элементов в коллекции: " + to_string(count));
+        return true;
+    }
+
+    // report
+    if (args[0] == "rp" || args[0] == "report")
+    {
+        if (args.size() != 1)
+        {
+            _out.Output("Некорректное количество аргументов команды report");
+            return false;
+        }
+
+        Order & ord = _col.getOrderRef(_col.getSize() - 1);
+
+        vector<DeviceApp> current_order_apps = ord.getDeviceApps();
+
+
+        std::map<std::string, std::set<std::string>> recommendations;
+
+        std::map<std::string, std::set<std::string>> coPurchaseMap;
+
+
+        for(size_t i=0; i < _col.getSize() - 1; ++i)
+        {
+            if (!_col.isRemoved(i))
+            {
+                const Order & o = _col.getOrderRef(i);
+                vector<DeviceApp> past_order_apps = o.getDeviceApps();
+
+                if (o.getDeviceApps().size() > 0) {
+                    
+                    // Построение мапы: приложение -> что покупали с ним
+                    for (const auto& app1 : past_order_apps) {
+                        for (const auto& app2 : past_order_apps) {
+                            if (app1.getAppName() != app2.getAppName()) {
+                                coPurchaseMap[app1.getAppName()].insert(app2.getAppName());
+                            }
+                        }
+                    }
+                    
+                    // Генерация рекомендаций на основе текущего заказа
+                    for (const auto& app : current_order_apps) {
+                        if (coPurchaseMap.find(app.getAppName()) != coPurchaseMap.end()) {
+                            recommendations[app.getAppName()] = coPurchaseMap[app.getAppName()];
+                        }
+                    }
+                }
+            }
+        }
+
+        // Вывод отчета
+        _out.Output("\nРекомендации для текущего заказа:\n");
+        for (const auto& [app, recommendedApps] : recommendations) {
+            _out.Output("С приложением \"" + app + "\" покупают следующее: ");
+            for (const auto& recommendedApp : recommendedApps) {
+                _out.Output(recommendedApp + ", ");
+            }
+            _out.Output("\b\b \n"); // Удаление последней запятой
+        }
+
         return true;
     }
 

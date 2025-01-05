@@ -11,7 +11,7 @@ Copyright (c) 2019 МГТУ им. Н.Э. Баумана, кафедра ИУ-6, 
 
 #include <string>
 
-#include "hw/l3_DomainLayer.h"
+#include "l3_DomainLayer.h"
 
 class IOutput
 {
