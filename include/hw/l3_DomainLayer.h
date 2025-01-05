@@ -21,7 +21,7 @@ const size_t MIN_NUM_OF_INSTALLING = 0;
 // const size_t MAX_NUM_OF_INSTALLING  = +INF;
 const size_t MAX_EVALUATION = 5;
 const size_t MIN_EVALUATION = 0;
-const size_t MAX_DATE_LENGTH = 10;
+const size_t MAX_DATE_LENGTH = 20;
 
 class DeviceApp
 {

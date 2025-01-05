@@ -5,6 +5,17 @@
 
 using namespace std;
 
+Order::Order(const std::string &date, std::vector<DeviceApp> apps)
+    : _date(date),
+      _device_apps(apps)
+{
+}
+
+Order::Order(std::vector<DeviceApp> apps)
+    : _device_apps(apps)
+{
+}
+
 const std::vector<DeviceApp> &Order::getDeviceApps() const
 {
     return _device_apps;
@@ -78,7 +89,7 @@ bool Order::write(ostream &os)
     size_t apps_count = _device_apps.size();
     writeNumber(os, apps_count);
 
-    for(const DeviceApp & d : _device_apps)
+    for (const DeviceApp &d : _device_apps)
     {
         writeString(os, d.getAppName());
         writeString(os, d.getCategory());
@@ -92,23 +103,29 @@ bool Order::write(ostream &os)
 }
 
 shared_ptr<ICollectable> ItemCollector::read(istream &is)
-{   
-    string date        = readString(is, MAX_DATE_LENGTH);
+{
+    string date = readString(is, MAX_DATE_LENGTH);
     size_t apps_count = readNumber<size_t>(is);
 
     vector<DeviceApp> apps;
 
     apps.reserve(apps_count);
-    for(size_t i=0; i < apps_count; ++i)
+    for (size_t i = 0; i < apps_count; ++i)
     {
-        string app_name = readString(is, MAX_APP_NAME_LENGTH);
-        string category = readString(is, MAX_CATEGORY_LENGTH);
+        const string app_name = readString(is, MAX_APP_NAME_LENGTH);
+        const string category = readString(is, MAX_CATEGORY_LENGTH);
         uint16_t app_cost = readNumber<uint16_t>(is);
         uint16_t app_size = readNumber<uint16_t>(is);
         uint32_t num_of_installing = readNumber<uint32_t>(is);
         uint8_t evaluation = readNumber<uint8_t>(is);
 
-        apps.push_back(DeviceApp(app_name, category, app_cost, app_size, num_of_installing, evaluation));
+        apps.push_back(DeviceApp(
+            app_name,
+            category,
+            app_cost,
+            app_size,
+            num_of_installing,
+            evaluation));
     }
 
     shared_ptr<ICollectable> order = std::make_shared<Order>(date, apps);
@@ -119,6 +136,6 @@ shared_ptr<ICollectable> ItemCollector::read(istream &is)
 Order &ItemCollector::getOrderRef(size_t index)
 {
     Order &b = *static_cast<Order *>(getItem(index).get());
-    
+
     return b;
 }

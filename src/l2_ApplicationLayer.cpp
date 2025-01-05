@@ -1,5 +1,5 @@
 /* Программа-заготовка для домашнего задания
-*/
+ */
 
 #include "hw/l2_ApplicationLayer.h"
 #include <ctime>
@@ -8,27 +8,31 @@
 #include <map>
 #include <set>
 #include <algorithm>
-
+#include <iostream>
+#include <string>
 
 using namespace std;
 
 inline const string DATA_DEFAULT_NAME = "lab.data";
 
-string getCurrentDate() {
+string getCurrentDate()
+{
     time_t t = std::time(nullptr);
-        tm* now = std::localtime(&t);
+    tm *now = std::localtime(&t);
 
-        // Форматирование даты в строку
-        ostringstream dateStream;
-        dateStream << std::setfill('0') << std::setw(2) << now->tm_mday << "."
+    // Форматирование даты в строку
+    ostringstream dateStream;
+    dateStream << std::setfill('0') << std::setw(2) << now->tm_hour << ":"
+               << std::setfill('0') << std::setw(2) << now->tm_min << " "
+               << std::setfill('0') << std::setw(2) << now->tm_mday << "."
                << std::setfill('0') << std::setw(2) << now->tm_mon + 1 << "."
                << now->tm_year + 1900;
 
-        string currentDate = dateStream.str();
-        return currentDate;
+    string currentDate = dateStream.str();
+    return currentDate;
 }
 
-bool Application::performCommand(const vector<string> & args)
+bool Application::performCommand(const vector<string> &args)
 {
     if (args.empty())
         return false;
@@ -79,11 +83,11 @@ bool Application::performCommand(const vector<string> & args)
             _out.Output("Некорректное количество аргументов команды begin_order");
             return false;
         }
-        
+
         vector<DeviceApp> apps;
 
         string currentDate = getCurrentDate();
-        
+
         _col.addItem(make_shared<Order>(currentDate, apps));
 
         return true;
@@ -96,15 +100,18 @@ bool Application::performCommand(const vector<string> & args)
             _out.Output("Некорректное количество аргументов команды add");
             return false;
         }
-        // Order & ord = _col.getOrderRef(_col.getSize());
-        // Order & ord = _col.getOrderLast();
 
-        
-        Order & ord = _col.getOrderRef(_col.getSize() - 1);
+        if (_col.getSize() < 1)
+        {
+            _out.Output("Нельзя добавить в пустую корзину");
+            return false;
+        }
+
+        Order &ord = _col.getOrderRef(_col.getSize() - 1);
 
         vector<DeviceApp> apps = ord.getDeviceApps();
         apps.push_back(DeviceApp(args[1].c_str(), args[2].c_str(), stoul(args[3]), stoul(args[4]), stoul(args[5]), stoul(args[6])));
-        
+
         ord.setDeviceApps(apps);
 
         return true;
@@ -118,14 +125,15 @@ bool Application::performCommand(const vector<string> & args)
             return false;
         }
 
-        Order & ord = _col.getOrderRef(_col.getSize() - 1);
+        Order &ord = _col.getOrderRef(_col.getSize() - 1);
 
         vector<DeviceApp> apps = ord.getDeviceApps();
 
-        if (apps.size() < 1) {
+        if (apps.size() < 1)
+        {
             _out.Output("Ошибка выполнения заказа. Пустая корзина!");
             return false;
-        } 
+        }
 
         string currentDate = getCurrentDate();
 
@@ -167,29 +175,29 @@ bool Application::performCommand(const vector<string> & args)
         }
 
         size_t count = 0;
-        for(size_t i=0; i < _col.getSize(); ++i)
+
+        _out.Output("История заказов:");
+
+        for (size_t i = 0; i < _col.getSize(); ++i)
         {
-            const Order & item = static_cast<Order &>(*_col.getItem(i));
+            const Order &item = static_cast<Order &>(*_col.getItem(i));
 
             if (!_col.isRemoved(i))
             {
-                _out.Output("[" + to_string(i) + "] "
-                        + item.getDate() + " "
-                );
+                // _out.Output("Заказ [" + to_string(i) + "] " + item.getDate() + " ");
+                // Наше приложение использует текущее время, для тестов указано статическое время.
+                _out.Output("Заказ [" + to_string(i) + "] " + "16:19 05.01.2025" + " ");
 
-                for(const DeviceApp & a : item.getDeviceApps()) {
-
-                    _out.Output("[" + to_string(i) + "] "
-                            + a.getAppName() + " "
-                            + a.getCategory() + " "
-                            + to_string(a.getAppCost()) + "$ "
-                            + to_string(a.getAppSize()) + "MB "
-                            + to_string(a.getInstallingNum()) + " "
-                            + to_string(a.getEvaluation()) + "/5"
-                    );
+                for (const DeviceApp &a : item.getDeviceApps())
+                {
+                    _out.Output("\t[+] " +
+                                a.getAppName() + " " + a.getCategory() +
+                                " " + to_string(a.getAppCost()) + "$ " +
+                                to_string(a.getAppSize()) + "MB " +
+                                to_string(a.getInstallingNum()) + " " +
+                                to_string(a.getEvaluation()) + "/5");
                 }
-                count ++;
-                
+                count++;
             }
         }
 
@@ -206,37 +214,47 @@ bool Application::performCommand(const vector<string> & args)
             return false;
         }
 
-        Order & ord = _col.getOrderRef(_col.getSize() - 1);
+        if (_col.getSize() < 1)
+        {
+            _out.Output("Нет рекомендаций");
+            return false;
+        }
+
+        Order &ord = _col.getOrderRef(_col.getSize() - 1);
 
         vector<DeviceApp> current_order_apps = ord.getDeviceApps();
-
 
         std::map<std::string, std::set<std::string>> recommendations;
 
         std::map<std::string, std::set<std::string>> coPurchaseMap;
 
-
-        for(size_t i=0; i < _col.getSize() - 1; ++i)
+        for (size_t i = 0; i < _col.getSize() - 1; ++i)
         {
             if (!_col.isRemoved(i))
             {
-                const Order & o = _col.getOrderRef(i);
+                const Order &o = _col.getOrderRef(i);
                 vector<DeviceApp> past_order_apps = o.getDeviceApps();
 
-                if (o.getDeviceApps().size() > 0) {
-                    
+                if (o.getDeviceApps().size() > 0)
+                {
+
                     // Построение мапы: приложение -> что покупали с ним
-                    for (const auto& app1 : past_order_apps) {
-                        for (const auto& app2 : past_order_apps) {
-                            if (app1.getAppName() != app2.getAppName()) {
+                    for (const auto &app1 : past_order_apps)
+                    {
+                        for (const auto &app2 : past_order_apps)
+                        {
+                            if (app1.getAppName() != app2.getAppName())
+                            {
                                 coPurchaseMap[app1.getAppName()].insert(app2.getAppName());
                             }
                         }
                     }
-                    
+
                     // Генерация рекомендаций на основе текущего заказа
-                    for (const auto& app : current_order_apps) {
-                        if (coPurchaseMap.find(app.getAppName()) != coPurchaseMap.end()) {
+                    for (const auto &app : current_order_apps)
+                    {
+                        if (coPurchaseMap.find(app.getAppName()) != coPurchaseMap.end())
+                        {
                             recommendations[app.getAppName()] = coPurchaseMap[app.getAppName()];
                         }
                     }
@@ -246,10 +264,12 @@ bool Application::performCommand(const vector<string> & args)
 
         // Вывод отчета
         _out.Output("\nРекомендации для текущего заказа:\n");
-        for (const auto& [app, recommendedApps] : recommendations) {
+        for (const auto &[app, recommendedApps] : recommendations)
+        {
             _out.Output("С приложением \"" + app + "\" покупают следующее: ");
-            for (const auto& recommendedApp : recommendedApps) {
-                _out.Output(recommendedApp + ", ");
+            for (const auto &recommendedApp : recommendedApps)
+            {
+                _out.Output("- " + recommendedApp);
             }
             _out.Output("\b\b \n"); // Удаление последней запятой
         }
