@@ -1,0 +1,58 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "D:\\laba3ssro\\ssrpo-lb2\\src\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\laba3ssro\\ssrpo-lb2\\src\\l1_UserInterface.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:l1_UserInterface.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|D:\\laba3ssro\\ssrpo-lb2\\src\\l2_ApplicationLayer.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:l2_ApplicationLayer.cpp||{D0E1A5C6-B359-4E41-9B60-3365922C2A22}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 1,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "l2_ApplicationLayer.cpp",
+              "DocumentMoniker": "D:\\laba3ssro\\ssrpo-lb2\\src\\l2_ApplicationLayer.cpp",
+              "RelativeDocumentMoniker": "l2_ApplicationLayer.cpp",
+              "ToolTip": "D:\\laba3ssro\\ssrpo-lb2\\src\\l2_ApplicationLayer.cpp",
+              "RelativeToolTip": "l2_ApplicationLayer.cpp",
+              "ViewState": "AgIAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-01-06T16:30:03.883Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "l1_UserInterface.cpp",
+              "DocumentMoniker": "D:\\laba3ssro\\ssrpo-lb2\\src\\l1_UserInterface.cpp",
+              "RelativeDocumentMoniker": "l1_UserInterface.cpp",
+              "ToolTip": "D:\\laba3ssro\\ssrpo-lb2\\src\\l1_UserInterface.cpp",
+              "RelativeToolTip": "l1_UserInterface.cpp",
+              "ViewState": "AgIAABgAAAAAAAAAAAAAACEAAAAZAAAAAAAAAA==",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000677|",
+              "WhenOpened": "2025-01-06T16:30:02.805Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{cce594b6-0c39-4442-ba28-10c64ac7e89f}"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

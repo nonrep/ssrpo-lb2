@@ -1,4 +1,4 @@
-TARGET = bin/lab
+shTARGET = bin/lab
 COMPILE = g++ -std=c++17 -c -Iinclude -O0 --coverage
 LINK = g++ --coverage
 SRC = src/
