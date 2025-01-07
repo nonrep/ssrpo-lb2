@@ -2,3 +2,10 @@
 
 test/make-result
 diff test/test-result.sample test/test-result.out
+
+test/make-result-stressgen
+diff test/samples/stressgen.sample test/stressgen.out
+
+test/make-result-stress-test
+diff test/samples/stress-test.sample test/stress-test.out
+

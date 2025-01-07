@@ -1,22 +1,35 @@
 Start
 === test/source/stress-test-templates/01.test ===
+с
+bo
 #100000
-a #W
+a #N #C #P #S #D #R
 #
+m
 s
+v
 --- Test --->
 Выполнение завершено успешно
 === test/source/stress-test-templates/02.test ===
-l
-#100000
-av #N 2020 12 04
+с
+bo
+#5
+a #N #C #P #S #D #R
 #
+rp
+m
+bo
+#100000
+a #N #C #P #S #D #R
+#
+m
 s
+v
 --- Test --->
 Выполнение завершено успешно
 === test/source/stress-test-templates/03.test ===
 l
-rp
+v
 
 --- Test --->
 eaPeqm 131
