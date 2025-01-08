@@ -11,3 +11,5 @@
 
 mkdir bin
 mkdir build
+touch bin/stressgen
+chmod +x bin/stressgen
