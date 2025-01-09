@@ -23,16 +23,25 @@ const std::vector<DeviceApp> &Order::getDeviceApps() const
 
 void Order::setDeviceApps(const std::vector<DeviceApp> &apps)
 {
+    std::lock_guard locker(_orders_mutex);
     _device_apps = apps;
+}
+
+void Order::addDeviceApp(const DeviceApp & app)
+{
+    std::lock_guard locker(_orders_mutex);
+    _device_apps.push_back(app);
 }
 
 const std::string Order::getDate() const
 {
+    std::lock_guard locker(_orders_mutex);
     return _date;
 }
 
 void Order::setDate(const std::string date)
 {
+    std::lock_guard locker(_orders_mutex);
     _date = date;
 }
 

@@ -11,6 +11,8 @@ Copyright (c) 2019 МГТУ им. Н.Э. Баумана, кафедра ИУ-6, 
 
 #include <string>
 
+#include "tp/Task_interface.h"
+
 #include "l3_DomainLayer.h"
 
 class IOutput
@@ -21,7 +23,7 @@ public:
     virtual void Output(std::string s) const = 0;
 };
 
-class Application
+class Application : public tp::Task_interface
 {
 public:
     Application() = delete;
@@ -29,15 +31,21 @@ public:
 
     Application & operator=(const Application &) = delete;
 
-    Application(const IOutput & out)
-        : _out(out)
+    Application(ItemCollector & col, const std::string & command, const IOutput & out)
+        : _col(col)
+        , _command(command)
+        , _out(out)
     {}
 
-    bool performCommand(const std::vector<std::string> & args);
+    // bool performCommand(const std::vector<std::string> & args);
 
+    virtual void work() override;
 private:
+     ItemCollector & _col;
+    std::string     _command;
     const IOutput & _out;
-    ItemCollector   _col;
+
+    std::vector<std::string> split(const std::string & str);
 };
 
 #endif // HW_L2_APPLICATION_LAYER_H

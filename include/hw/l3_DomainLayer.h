@@ -11,6 +11,8 @@ Copyright (c) 2019 МГТУ им. Н.Э. Баумана, кафедра ИУ-6, 
 
 #include "l4_InfrastructureLayer.h"
 
+#include <vector>
+
 const size_t MAX_APP_NAME_LENGTH = 50;
 const size_t MAX_CATEGORY_LENGTH = 50;
 const size_t MIN_APP_COST = 0;
@@ -52,6 +54,7 @@ class Order : public ICollectable
 {
     std::string _date;
     std::vector<DeviceApp> _device_apps;
+    mutable std::mutex _orders_mutex;
 
 public:
     Order() = delete;
@@ -67,6 +70,7 @@ public:
 
     void setDeviceApps(const std::vector<DeviceApp> &apps);
     const std::vector<DeviceApp> &getDeviceApps() const;
+    void addDeviceApp(const DeviceApp & app);
 
     virtual bool write(std::ostream &os) override;
 };

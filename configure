@@ -11,5 +11,7 @@
 
 mkdir bin
 mkdir build
+touch bin/lab
+chmod +x bin/lab
 touch bin/stressgen
 chmod +x bin/stressgen

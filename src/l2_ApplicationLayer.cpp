@@ -32,48 +32,59 @@ string getCurrentDate()
     return currentDate;
 }
 
-bool Application::performCommand(const vector<string> &args)
+void Application::work()
 {
+    std::vector<std::string> args = split(_command);
     if (args.empty())
-        return false;
+        return;
 
-    if (args[0] == "l" || args[0] == "load")
-    {
-        string filename = (args.size() == 1) ? DATA_DEFAULT_NAME : args[1];
+    // if (args[0] == "l" || args[0] == "load")
+    // {
+    //     string filename = (args.size() == 1) ? DATA_DEFAULT_NAME : args[1];
 
-        if (!_col.loadCollection(filename))
-        {
-            _out.Output("Ошибка при загрузке файла '" + filename + "'");
-            return false;
-        }
+    //     if (!_col.loadCollection(filename))
+    //     {
+    //         _out.Output("Ошибка при загрузке файла '" + filename + "'");
+    //         return;
+    //     }
 
-        return true;
-    }
+    //     return;
+    // }
 
-    if (args[0] == "s" || args[0] == "save")
-    {
-        string filename = (args.size() == 1) ? DATA_DEFAULT_NAME : args[1];
+    // if (args[0] == "s" || args[0] == "save")
+    // {
+    //     string filename = (args.size() == 1) ? DATA_DEFAULT_NAME : args[1];
 
-        if (!_col.saveCollection(filename))
-        {
-            _out.Output("Ошибка при сохранении файла '" + filename + "'");
-            return false;
-        }
+    //     if (!_col.saveCollection(filename))
+    //     {
+    //         _out.Output("Ошибка при сохранении файла '" + filename + "'");
+    //         return;
+    //     }
 
-        return true;
-    }
+    //     return;
+    // }
 
-    if (args[0] == "c" || args[0] == "clean")
-    {
-        if (args.size() != 1)
-        {
+    // if (args[0] == "c" || args[0] == "clean")
+    // {
+    //     if (args.size() != 1)
+    //     {
+    //         _out.Output("Некорректное количество аргументов команды clean");
+    //         return;
+    //     }
+
+    //     _col.clean();
+
+    //     return;
+    // }
+
+    if (args[0] == "c" || args[0] == "count") {
+        if (args.size() != 1) {
             _out.Output("Некорректное количество аргументов команды clean");
-            return false;
+            return;
         }
 
-        _col.clean();
-
-        return true;
+        _out.Output(std::to_string(_col.getSize()));
+        return;
     }
 
     if (args[0] == "bo" || args[0] == "begin_order")
@@ -81,7 +92,7 @@ bool Application::performCommand(const vector<string> &args)
         if (args.size() != 1)
         {
             _out.Output("Некорректное количество аргументов команды begin_order");
-            return false;
+            return;
         }
 
         vector<DeviceApp> apps;
@@ -90,7 +101,7 @@ bool Application::performCommand(const vector<string> &args)
 
         _col.addItem(make_shared<Order>(currentDate, apps));
 
-        return true;
+        return;
     }
 
     if (args[0] == "a" || args[0] == "add")
@@ -98,13 +109,13 @@ bool Application::performCommand(const vector<string> &args)
         if (args.size() != 7)
         {
             _out.Output("Некорректное количество аргументов команды add");
-            return false;
+            return;
         }
 
         if (_col.getSize() < 1)
         {
             _out.Output("Нельзя добавить в пустую корзину");
-            return false;
+            return;
         }
 
         Order &ord = _col.getOrderRef(_col.getSize() - 1);
@@ -114,7 +125,7 @@ bool Application::performCommand(const vector<string> &args)
 
         ord.setDeviceApps(apps);
 
-        return true;
+        return;
     }
 
     if (args[0] == "m" || args[0] == "make")
@@ -122,7 +133,7 @@ bool Application::performCommand(const vector<string> &args)
         if (args.size() != 1)
         {
             _out.Output("Некорректное количество аргументов команды make");
-            return false;
+            return;
         }
 
         Order &ord = _col.getOrderRef(_col.getSize() - 1);
@@ -132,14 +143,14 @@ bool Application::performCommand(const vector<string> &args)
         if (apps.size() < 1)
         {
             _out.Output("Ошибка выполнения заказа. Пустая корзина!");
-            return false;
+            return;
         }
 
         string currentDate = getCurrentDate();
 
         ord.setDate(currentDate);
 
-        return true;
+        return;
     }
 
     if (args[0] == "r" || args[0] == "remove")
@@ -147,11 +158,11 @@ bool Application::performCommand(const vector<string> &args)
         if (args.size() != 2)
         {
             _out.Output("Некорректное количество аргументов команды remove");
-            return false;
+            return;
         }
 
         _col.removeItem(stoul(args[1]));
-        return true;
+        return;
     }
 
     // if (args[0] == "u" || args[0] == "update")
@@ -159,11 +170,11 @@ bool Application::performCommand(const vector<string> &args)
     //     if (args.size() != 8)
     //     {
     //         _out.Output("Некорректное количество аргументов команды update");
-    //         return false;
+    //         return;
     //     }
 
     //     _col.updateItem(stoul(args[1]), make_shared<DeviceApp>(args[2].c_str(), args[3].c_str(), stoul(args[4]), stoul(args[5]), stoul(args[6]), stoul(args[7])));
-    //     return true;
+    //     return;
     // }
 
     if (args[0] == "v" || args[0] == "view")
@@ -171,7 +182,7 @@ bool Application::performCommand(const vector<string> &args)
         if (args.size() != 1)
         {
             _out.Output("Некорректное количество аргументов команды view");
-            return false;
+            return;
         }
 
         size_t count = 0;
@@ -202,7 +213,7 @@ bool Application::performCommand(const vector<string> &args)
         }
 
         _out.Output("Количество элементов в коллекции: " + to_string(count));
-        return true;
+        return;
     }
 
     // report
@@ -211,13 +222,13 @@ bool Application::performCommand(const vector<string> &args)
         if (args.size() != 1)
         {
             _out.Output("Некорректное количество аргументов команды report");
-            return false;
+            return;
         }
 
         if (_col.getSize() < 1)
         {
             _out.Output("Нет рекомендаций");
-            return false;
+            return;
         }
 
         Order &ord = _col.getOrderRef(_col.getSize() - 1);
@@ -274,9 +285,34 @@ bool Application::performCommand(const vector<string> &args)
             _out.Output("\b\b \n"); // Удаление последней запятой
         }
 
-        return true;
+        return;
     }
 
     _out.Output("Недопустимая команда '" + args[0] + "'");
-    return false;
+    return;
+}
+
+std::vector<std::string> Application::split(const std::string & str)
+{
+    std::vector<std::string> res;
+    size_t                   start_pos = 0, 
+                             end_pos   = 0;
+
+    while(end_pos < str.size()) 
+    {
+        for(start_pos = end_pos; start_pos < str.size(); ++start_pos)
+            if (str[start_pos] != ' ')
+                break;
+
+        if (start_pos == str.size())
+            return res;
+
+        for(end_pos = start_pos; end_pos < str.size(); ++end_pos)
+            if (str[end_pos] == ' ')
+                break;
+
+        res.push_back(str.substr(start_pos,end_pos-start_pos));
+    }
+
+    return res;
 }

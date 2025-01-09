@@ -6,12 +6,9 @@ bo
 a #N #C #P #S #D #R
 #
 m
-s
 v
 --- Test --->
-Выполнение завершено успешно
 === test/source/stress-test-templates/02.test ===
-с
 bo
 #5
 a #N #C #P #S #D #R
@@ -23,11 +20,8 @@ bo
 a #N #C #P #S #D #R
 #
 m
-s
 v
 --- Test --->
-Выполнение завершено успешно
 === test/source/stress-test-templates/03.test ===
-l
-v--- Test --->
-Выполнение завершено успешно
+v
+--- Test --->
